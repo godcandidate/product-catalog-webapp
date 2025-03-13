@@ -1,4 +1,6 @@
-import React, { createContext, useState, useCallback } from 'react';
+import React, { createContext, useState, useCallback, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from './AuthContext';
 import { Product, productApi } from '../services/api';
 import { toast } from 'react-toastify';
 
@@ -16,6 +18,15 @@ export const ProductContext = createContext<ProductContextType | undefined>(unde
 export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const auth = useContext(AuthContext);
+
+  // Check authentication on mount and when auth state changes
+  useEffect(() => {
+    if (!auth?.isAuthenticated) {
+      navigate('/login');
+    }
+  }, [auth?.isAuthenticated, navigate]);
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -32,11 +43,26 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const addProduct = async (product: Omit<Product, 'id'>) => {
     try {
+      if (!auth?.isAuthenticated) {
+        toast.error('Please log in to add products');
+        navigate('/login');
+        return;
+      }
+
       await productApi.createProduct(product);
-      toast.success('Product added successfully');
       await fetchProducts(); // Refresh the products list
+      toast.success('Product added successfully');
     } catch (error) {
-      toast.error('Failed to add product');
+      if (error instanceof Error) {
+        // If token is invalid, redirect to login
+        if (error.message.includes('Authentication required') || error.message.includes('log in')) {
+          auth?.logout(); // Clear invalid token
+          navigate('/login');
+        }
+        toast.error(error.message);
+      } else {
+        toast.error('Failed to add product');
+      }
       throw error;
     }
   };

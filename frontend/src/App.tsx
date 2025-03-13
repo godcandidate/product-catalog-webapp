@@ -18,9 +18,9 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
 
 function App() {
   return (
-    <AuthProvider>
-      <ProductProvider>
-        <Router>
+    <Router>
+      <AuthProvider>
+        <ProductProvider>
           <div className="min-h-screen bg-gray-50">
             <Navbar />
             <ToastContainer position="top-right" autoClose={3000} />
@@ -38,9 +38,9 @@ function App() {
               />
             </Routes>
           </div>
-        </Router>
-      </ProductProvider>
-    </AuthProvider>
+        </ProductProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 
