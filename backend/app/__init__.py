@@ -10,6 +10,15 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
+    # Enable CORS
+    @app.after_request
+    def after_request(response):
+        response.headers.add('Access-Control-Allow-Origin', 'http://localhost:5173')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+        response.headers.add('Access-Control-Allow-Credentials', 'true')
+        return response
+
     # Initialize extensions
     db.init_app(app)
     bcrypt.init_app(app)

@@ -52,7 +52,7 @@ def add_product():
         db.session.add(product)
         db.session.commit()
 
-        return jsonify({"message": "Product added successfully", "product_id": product.id}), 201
+        return jsonify({"message": "Product added successfully"}), 201
     except Exception as e:
         print(f"Error adding product: {str(e)}")  # For debugging
         return jsonify({"error": "Failed to add product"}), 500
