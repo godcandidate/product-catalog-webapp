@@ -1,22 +1,24 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { UserPlus, Mail, Lock, User } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 const Signup = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate();
   const { signup } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await signup(name, email, password);
+      toast.success('Account created successfully! Logging you in...');
       navigate('/dashboard');
     } catch (error) {
-      console.error('Signup failed:', error);
+      toast.error(error instanceof Error ? error.message : 'Signup failed');
     }
   };
 

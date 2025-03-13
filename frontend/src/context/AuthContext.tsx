@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
+import { authApi } from '../services/api';
+import { User, decodeToken } from './authUtils';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -6,39 +8,64 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   signup: (name: string, email: string, password: string) => Promise<void>;
+  error: string | null;
 }
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  // Check for existing token on mount
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedUser = decodeToken(token);
+      if (decodedUser) {
+        setUser(decodedUser);
+      } else {
+        localStorage.removeItem('token');
+      }
+    }
+  }, []);
 
   const login = async (email: string, password: string) => {
-    // Mock login - replace with real authentication
-    setUser({
-      id: '1',
-      name: 'Demo User',
-      email: email
-    });
+    try {
+      setError(null);
+      const response = await authApi.login(email, password);
+      localStorage.setItem('token', response.token);
+      
+      const decodedUser = decodeToken(response.token);
+      if (decodedUser) {
+        setUser(decodedUser);
+      } else {
+        throw new Error('Invalid token received');
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Login failed';
+      setError(errorMessage);
+      throw error;
+    }
   };
 
   const logout = () => {
+    localStorage.removeItem('token');
     setUser(null);
+    setError(null);
   };
 
   const signup = async (name: string, email: string, password: string) => {
-    // Mock signup - replace with real authentication
-    setUser({
-      id: '1',
-      name: name,
-      email: email
-    });
+    try {
+      setError(null);
+      await authApi.signup(name, email, password);
+      // After successful signup, log the user in
+      await login(email, password);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Signup failed';
+      setError(errorMessage);
+      throw error;
+    }
   };
 
   return (
@@ -48,18 +75,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         user,
         login,
         logout,
-        signup
+        signup,
+        error
       }}
     >
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
 };
