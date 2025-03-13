@@ -24,8 +24,9 @@ def login():
     user = User.query.filter_by(email=data["email"]).first()
 
     if user and user.check_password(data["password"]):
+        print(f"User ID: {user.id}, Type: {type(user.id)}")
         # Convert user.id to string to fix the JWT subject issue
-        token = create_access_token(identity=str(user.id))
+        token = create_access_token(identity=str(user.id),additional_claims={"name": user.name} )
         return jsonify({"token": token})
 
     return jsonify({"message": "Invalid credentials"}), 401
