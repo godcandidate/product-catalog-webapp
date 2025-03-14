@@ -1,4 +1,4 @@
-import React, { createContext, useState, useCallback, useEffect, useContext } from 'react';
+import React, { createContext, useState, useCallback, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from './AuthContext';
 import { Product, productApi } from '../services/api';
@@ -21,21 +21,14 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const navigate = useNavigate();
   const auth = useContext(AuthContext);
 
-  // Check authentication on mount and when auth state changes
-  useEffect(() => {
-    if (!auth?.isAuthenticated) {
-      navigate('/login');
-    }
-  }, [auth?.isAuthenticated, navigate]);
-
   const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
-      const fetchedProducts = await productApi.getUserProducts();
-      setProducts(fetchedProducts);
-    } catch (error) {
-      toast.error('Failed to fetch products');
-      console.error('Error fetching products:', error);
+      const data = await productApi.getUserProducts();
+      setProducts(data);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to fetch products';
+      toast.error(message);
     } finally {
       setLoading(false);
     }

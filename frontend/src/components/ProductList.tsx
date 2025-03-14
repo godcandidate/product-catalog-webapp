@@ -4,6 +4,7 @@ import { useProducts } from '../hooks/useProducts';
 import { ProductForm } from './ProductForm';
 import { Pencil, Trash2, Plus, Search, X } from 'lucide-react';
 import { PRODUCT_CATEGORIES } from '../constants/categories';
+import { toast } from 'react-toastify';
 
 export const ProductList: React.FC = () => {
   const { products, loading, deleteProduct, fetchProducts } = useProducts();
@@ -11,6 +12,7 @@ export const ProductList: React.FC = () => {
   const [editingProduct, setEditingProduct] = useState<Product | undefined>();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [deletingProductId, setDeletingProductId] = useState<number | null>(null);
 
   useEffect(() => {
     fetchProducts();
@@ -22,13 +24,47 @@ export const ProductList: React.FC = () => {
   };
 
   const handleDelete = async (id: number) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
-      try {
-        await deleteProduct(id);
-      } catch (error) {
-        console.error('Error deleting product:', error);
+    setDeletingProductId(id);
+    toast.info(
+      <div className="bg-white p-4 rounded-lg shadow-lg w-full max-w-sm mx-auto">
+        <p className="mb-4 text-gray-700 text-center font-medium">Are you sure you want to delete this product?</p>
+        <div className="flex justify-center space-x-4">
+          <button
+            onClick={() => {
+              toast.dismiss();
+              setDeletingProductId(null);
+            }}
+            className="px-6 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 bg-gray-100 rounded-md transition-colors"
+          >
+            No
+          </button>
+          <button
+            onClick={async () => {
+              toast.dismiss();
+              try {
+                await deleteProduct(id);
+                // Success message is shown by ProductContext
+              } catch (err) {
+                const message = err instanceof Error ? err.message : 'Failed to delete product';
+                toast.error(message);
+              }
+              setDeletingProductId(null);
+            }}
+            className="px-6 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors"
+          >
+            Yes, Delete
+          </button>
+        </div>
+      </div>,
+      {
+        position: "top-center",
+        autoClose: 8000,
+        closeOnClick: false,
+        draggable: false,
+        closeButton: true,
+        className: 'w-full max-w-sm mx-auto'
       }
-    }
+    );
   };
 
   const handleAddNew = () => {
@@ -174,13 +210,17 @@ export const ProductList: React.FC = () => {
                     onClick={() => handleEdit(product)}
                     className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                     title="Edit product"
+                    disabled={deletingProductId === product.id}
                   >
                     <Pencil className="w-5 h-5" />
                   </button>
                   <button
                     onClick={() => product.id && handleDelete(product.id)}
-                    className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    className={`p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors ${
+                      deletingProductId === product.id ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                     title="Delete product"
+                    disabled={deletingProductId === product.id}
                   >
                     <Trash2 className="w-5 h-5" />
                   </button>
