@@ -35,7 +35,7 @@ assets  index.html
 
 ---
 
-## **📌 Step 3: Create Nginx Configuration**  
+## Create Nginx Configuration
 
 1. Open a new Nginx configuration file:  
    ```sh
@@ -47,7 +47,7 @@ assets  index.html
 
 ---
 
-## **📌 Step 4: Enable the Configuration**  
+##  Enable the Configuration
 
 1. Create a symbolic link to enable the site:  
 
@@ -62,14 +62,14 @@ assets  index.html
    ```
 
 3. Restart Nginx to apply changes: 
- 
+
    ```sh
    sudo systemctl reload nginx
    ```
 
 ---
 
-## **📌 Step 5: Verify the Setup**  
+## Verify the Setup
 
 - Visit **`http://your-server-ip/`** → You should see the frontend.  
 - Visit **`http://your-server-ip/api/products`** → Should fetch data from the backend.  
