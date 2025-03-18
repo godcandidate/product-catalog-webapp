@@ -1,10 +1,10 @@
-### **📌 Nginx Reverse Proxy Setup for Catalog-Fullstack**  
+# Nginx Reverse Proxy Setup for Catalog-Fullstack**  
 
 This guide will help you set up **Nginx as a reverse proxy** for your **Catalog-Fullstack** project. The reverse proxy directs requests to the appropriate backend service.  
 
 ---
 
-## **📌 Step 1: Install Nginx**  
+## Install Nginx
 
 If Nginx is not installed, install it using:  
 ```sh
@@ -18,14 +18,16 @@ sudo systemctl status nginx
 
 ---
 
-## **📌 Step 2: Set Up Your Frontend Directory**  
-Ensure your frontend build files are in `/var/www/catalog-frontend/`:  
+## Set Up Your Frontend Directory
+Ensure your frontend build files are in `/var/www/catalog-frontend/`
+
 ```sh
 cd frontend
 npm run build
 sudo cp -r dist/* /var/www/catalog-frontend  
 ls /var/www/catalog-frontend
 ```
+
 You should see:  
 ```
 assets  index.html
@@ -39,6 +41,7 @@ assets  index.html
    ```sh
    sudo nano /etc/nginx/sites-available/catalog
    ```
+
 2. Add the following configuration:  
    ![Configure catalog](../assets/configure.png) 
 
@@ -47,14 +50,19 @@ assets  index.html
 ## **📌 Step 4: Enable the Configuration**  
 
 1. Create a symbolic link to enable the site:  
+
    ```sh
    sudo ln -s /etc/nginx/sites-available/catalog /etc/nginx/sites-enabled/
    ```
+
 2. Test the Nginx configuration:  
+
    ```sh
    sudo nginx -t
    ```
-3. Restart Nginx to apply changes:  
+
+3. Restart Nginx to apply changes: 
+ 
    ```sh
    sudo systemctl reload nginx
    ```
