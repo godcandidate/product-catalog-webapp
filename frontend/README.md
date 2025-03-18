@@ -9,6 +9,7 @@ This is the React-based frontend for the Product Catalog Service. It provides us
 - Responsive UI
 
 ## Screenshoots
+![Homepage](./assets/cat_home.png)  
 ![Authenicate](../assets/authenticate.png)
 ![Dashboard](../assets/cat_dashboard.png)
 

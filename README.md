@@ -4,7 +4,7 @@ A full-stack web application where users can manage their products or services. 
 
 
 ## Architecture 
-![Architecture](./assets/catalog-architecture.png)
+<p align="center"> <img src="./assets/catalog-architecture.png" alt="Architecture" width="800"> </p>
 
 
 ## Features  
@@ -15,8 +15,6 @@ A full-stack web application where users can manage their products or services. 
 - **Search**: Find products by name, category, or price range.  
 - **Responsive Design**: User-friendly UI.  
 - **Nginx Reverse Proxy**: Routes traffic between the React frontend and Flask backend.  
-
-![Homepage](./assets/cat_home.png)  
 
 ## Tech Stack  
 
